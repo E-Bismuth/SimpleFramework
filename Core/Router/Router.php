@@ -32,6 +32,10 @@ class Router
      */
     private $namedRoutes = [];
 
+    private $prefix = '';
+
+    private $RewritePrefix = true;
+
     /**Get the url
      * Router constructor.
      * @param $url
@@ -69,18 +73,64 @@ class Router
      * @return Route
      */
     protected function add($path, $callable, $name, $method){
+
+        if($this->prefix != ''){
+            $path = substr($this->prefix,0,-1) . $path;
+        }
+
         $route = new Route($path,$callable);
+
         if((is_string($callable)) && $name === null){
-            $this->namedRoutes[$callable] = $route;
-            $route->setName($callable);
+            $this->namedRoutes[$this->prefix.$callable] = $route;
+            $route->setName($this->prefix.$callable);
         }
         else if($name){
-            $this->namedRoutes[$name] = $route;
-            $route->setName($name);
+            $this->namedRoutes[$this->prefix.$name] = $route;
+            $route->setName($this->prefix.$name);
 
         }
         $this->routes[$method][]=$route;
+
+        if($this->RewritePrefix)
+            $this->prefix = '';
+
+
         return $route;
+    }
+
+    public function prefix($prefix){
+        $this->prefix = $prefix . '/';
+        return $this;
+    }
+
+    public function unRewritePrefix(){
+        $this->RewritePrefix = false;
+    }
+
+    public function group($prefix, callable $callback = null){
+        if($prefix == '')
+            throw new routerException('Can\'t create a group without prefix');
+
+        if($callback === null)
+            return $this->prefix($prefix);
+
+        $newRouter = new Router($this->url);
+        $newRouter->unRewritePrefix();
+        $newRouter->prefix($prefix);
+
+        $newGroup = call_user_func($callback, $newRouter);
+
+
+        foreach ($newGroup->showRoutes() AS $Method=>$newMethodedRoutes){
+            foreach ($newMethodedRoutes as $newRoute) {
+                $this->routes[$Method][] = $newRoute;
+            }
+
+        }
+        foreach ($newGroup->showNamed() AS $newNamedRoutes){
+                $this->namedRoutes[$newNamedRoutes->getName()] = $newNamedRoutes;
+        }
+        return false;
     }
 
     /**Find the Route
@@ -102,8 +152,11 @@ class Router
     /**Show all the route (good for debugging)
      * @return array
      */
-    public function show(){
+    public function showRoutes(){
         return $this->routes;
+    }
+    public function showNamed(){
+        return $this->namedRoutes;
     }
 
     /**Build Url by routes

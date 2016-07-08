@@ -90,6 +90,10 @@ class Route
     {
         $this->name = $name;
     }
+    public function getName()
+    {
+        return $this->name;
+    }
 
     /**Found matches
      * @param $matches
