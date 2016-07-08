@@ -9,7 +9,6 @@
 
 namespace Core\Model;
 
-use Core\Model\partial\partialModelGeneral;
 use Core\Model\src\ModelException;
 
 /** List of all the possibilities of the model
@@ -17,9 +16,8 @@ use Core\Model\src\ModelException;
  * Class Model
  * @package Core\Model
  */
-abstract class Model
+abstract class Model extends innerModel
 {
-    use partialModelGeneral;
 
 
     /** ----------------------------   Model parameters  ------------------------------------ */
@@ -57,6 +55,8 @@ abstract class Model
 
         $this->db = $db;
     }
+
+    abstract protected function Relations();
 
     /** ----------------------------   Query Builder  ------------------------------------ */
 

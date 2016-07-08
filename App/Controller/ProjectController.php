@@ -22,7 +22,10 @@ class ProjectController extends appController
     }
 
     public function index(){
-        $projects = $this->ProjectModel->fields('Name')->select()->get();
+        $projects = $this->ProjectModel
+            ->fields('Name')
+            ->group('left')
+            ->select()->get();
 
         $this->render('Project#index',compact('projects'));
     }
