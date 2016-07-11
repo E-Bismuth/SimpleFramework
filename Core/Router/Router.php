@@ -32,15 +32,25 @@ class Router
      */
     private $namedRoutes = [];
 
+    /**Prefix for routes
+     * @var string
+     */
     private $prefix = '';
 
+    /**Make prefix fix for routes
+     * @var bool
+     */
     private $RewritePrefix = true;
 
     /**Get the url
      * Router constructor.
      * @param $url
      */
-    public function __construct($url){
+    public function __construct($url,$fixPrefix = null){
+        if($fixPrefix != null){
+            $this->unRewritePrefix();
+            $this->prefix($fixPrefix);
+        }
         $this->url = $url;
     }
 
@@ -98,27 +108,51 @@ class Router
         return $route;
     }
 
+    /**Set prefix
+     * @param $prefix
+     * @return $this
+     */
     public function prefix($prefix){
         $this->prefix = $prefix . '/';
         return $this;
     }
 
+    /**Block the prefix for the rest of routes
+     *
+     */
     public function unRewritePrefix(){
         $this->RewritePrefix = false;
     }
 
-    public function group($prefix, callable $callback = null){
+    /** Group a list of routes
+     * @param $prefix
+     * @param null $callback
+     * @return bool|Router
+     * @throws routerException
+     */
+    public function group($prefix, $callback = null){
+
+
         if($prefix == '')
             throw new routerException('Can\'t create a group without prefix');
 
-        if($callback === null)
+        if($callback instanceof \Core\Router\Router){
+            $newGroup = $callback;
+        }
+        else if(get_class($callback) == 'Closure'){
+            $newRouter = new Router($this->url);
+            $newRouter->unRewritePrefix();
+            $newRouter->prefix($prefix);
+
+            $newGroup = call_user_func($callback, $newRouter);
+        }
+        else if($callback === null){
             return $this->prefix($prefix);
+        }
+        else{
+            throw new routerException('Parameter must be a function or Core\Router\Router object');
+        }
 
-        $newRouter = new Router($this->url);
-        $newRouter->unRewritePrefix();
-        $newRouter->prefix($prefix);
-
-        $newGroup = call_user_func($callback, $newRouter);
 
 
         foreach ($newGroup->showRoutes() AS $Method=>$newMethodedRoutes){
@@ -155,6 +189,10 @@ class Router
     public function showRoutes(){
         return $this->routes;
     }
+
+    /**Show all the Named route (good for debugging)
+     * @return array
+     */
     public function showNamed(){
         return $this->namedRoutes;
     }

@@ -25,6 +25,7 @@ require_once('../Core/autoload.php');
 projectDefine::set('ROOT',dirname(__DIR__));
 projectDefine::set('THEME','Default');
 
+$Admin = new \Core\Router\Router($_GET['url'],'Admin');
 $routes = new \Core\Router\Router($_GET['url']);
 
 $routes->get('/Project','Project@index');
@@ -32,12 +33,20 @@ $routes->get('/Project','Project@index');
 $routes->prefix('test')->get('/Project/test','Project@bla');
 $routes->get('/Project/test','Project@show');
 
-$routes->group('Admin',function(\Core\Router\Router $router){
-   $router->get('/Category','Category@index');
-   $router->get('/Category/test','Category@show');
-   $router->get('/Category/boris','Category@bla');
-    return $router;
-});
+
+
+$Admin->get('/Post','Category@index');
+$Admin->get('/Post/test','Category@show');
+$Admin->get('/Post/bla','Category@bla');
+
+
+//$routes->group('Admin',function(\Core\Router\Router $router){
+//   $router->get('/Category','Category@index');
+//   $router->get('/Category/test','Category@show');
+//   $router->get('/Category/boris','Category@bla');
+//    return $router;
+//});
+$routes->group('Admin',$Admin);
 
 Debug::die_show($routes->showNamed());
 
