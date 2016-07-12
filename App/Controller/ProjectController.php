@@ -19,9 +19,10 @@ class ProjectController extends appController
 
     public function __construct(){
         parent::__construct();
+        
         $this->ProjectModel = new \App\Model\Project();
     }
-    
+
     public function index(){
         $projects = $this->ProjectModel
             ->fields(['Amount'=>['Action'=>'CONCAT','Value'=>['FirstName',' ','LastName']]])
