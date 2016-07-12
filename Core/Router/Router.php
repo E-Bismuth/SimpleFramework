@@ -88,7 +88,7 @@ class Router
             $path = substr($this->prefix,0,-1) . $path;
         }
 
-        $route = new Route($path,$callable);
+        $route = $this->singleRouteInstance($path,$callable);
 
         if((is_string($callable)) && $name === null){
             $this->namedRoutes[$this->prefix.$callable] = $route;
@@ -106,6 +106,15 @@ class Router
 
 
         return $route;
+    }
+
+    /**Return an instance of Route (separate in order to easily change the route instance)
+     * @param $path
+     * @param $callable
+     * @return Route
+     */
+    protected function singleRouteInstance($path, $callable){
+        return new Route($path,$callable);
     }
 
     /**Set prefix
