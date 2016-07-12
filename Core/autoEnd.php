@@ -13,6 +13,7 @@ use Core\Magic\Variables\Session\Flash;
 
 class autoEnd
 {
+    
 
 }
 
