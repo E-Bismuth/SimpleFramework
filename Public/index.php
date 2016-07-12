@@ -28,6 +28,8 @@ projectDefine::set('THEME','Default');
 $Admin = new \Core\Router\Router($_GET['url'],'Admin');
 $routes = new \Core\Router\Router($_GET['url']);
 
+$routes->get('/','Project@index');
+
 $routes->get('/Project','Project@index');
 //die(var_dump(get_class($routes)));
 $routes->prefix('test')->get('/Project/test','Project@bla');
@@ -48,7 +50,7 @@ $Admin->get('/Post/bla','Category@bla');
 //});
 $routes->group('Admin',$Admin);
 
-Debug::die_show($routes->showNamed());
+//Debug::die_show($routes->showRoutes());
 
 $routes->run();
 

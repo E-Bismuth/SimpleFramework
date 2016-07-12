@@ -11,6 +11,7 @@ namespace App\Controller;
 
 
 use Core\Magic\Variables\projectVars\projectVars;
+use Core\Model\Model;
 
 class ProjectController extends appController
 {
@@ -20,13 +21,16 @@ class ProjectController extends appController
         parent::__construct();
         $this->ProjectModel = new \App\Model\Project();
     }
-
+    
     public function index(){
         $projects = $this->ProjectModel
-            ->fields('Name')
-            ->select()->get();
+            ->fields(['Amount'=>['Action'=>'CONCAT','Value'=>['FirstName',' ','LastName']]])
+            ->select()->debug();
 
-        $this->render('Project#index',compact('projects'));
+        \Core\Magic\Debug\Debug::die_show($projects);
+
+
+//        $this->render('Project#index',compact('projects'));
     }
     public function show(){
         $projects = $this->ProjectModel->select()->get();

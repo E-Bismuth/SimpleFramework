@@ -20,6 +20,12 @@ abstract class innerModel
      * @var array
      */
     protected $selectedKeys = [];
+
+    /**List of field name already use in order to rename if an
+     * other one is required with the same name
+     * @var array
+     */
+    protected $existingKeys = [];
     /** All the field on where by tables
      * @var array
      */
@@ -86,8 +92,26 @@ abstract class innerModel
             $this->selectedKeys[$table]=[];
         }
         if(is_array($keys)){
-            foreach ($keys AS $value){
-                $this->selectedKeys[$table][] = $value;
+            foreach ($keys AS $key=>$value){
+                if(is_array($value)){
+                    if(in_array($key,$this->existingKeys)){
+                        $key = $table . ucfirst($key);
+                    }
+                    $this->existingKeys[]=$key;
+                    $this->selectedKeys[$table][$key] = $value;
+                }
+                else{
+                    if(in_array($value,$this->existingKeys)){
+                        $valueAs = $table . ucfirst($value);
+                        $this->selectedKeys[$table][] = $value. ' AS '.$valueAs;
+                        $saveValue = $valueAs;
+                    }
+                    else{
+                        $this->selectedKeys[$table][] = $value;
+                        $saveValue = $value;
+                    }
+                    $this->existingKeys[]=$saveValue;
+                }
             }
         }
         else{
@@ -582,8 +606,27 @@ abstract class innerModel
         }
         if(!empty($this->selectedKeys)){
             foreach ($this->selectedKeys AS $tables=>$keys){
-                foreach ($keys AS $key){
-                    $arrVar[]=$tables.'.'.$key;
+                foreach ($keys AS $key=>$value){
+                    if(is_array($value)){
+                        if((!array_key_exists('Action',$value)) || (!array_key_exists('Value',$value))){
+                            throw new ModelException('You have to provide "Action" and "Value" in order to define a special field');
+                        }
+                        else{
+                            $string = '';
+                            foreach ($value['Value'] AS $k=>$v){
+                                if(preg_match("/[a-zA-Z-_0-9]+/", $v)){
+                                    $string .= $tables.'.'.$v.',';
+                                }
+                                else{
+                                    $string .= '"'.$v.'",';
+                                }
+                            }
+                            $arrVar[] = $value['Action']. '(' .substr($string,0,-1) . ') AS '.$key;
+                        }
+                    }
+                    else{
+                        $arrVar[]=$tables.'.'.$value;
+                    }
                 }
             }
             $var = implode(',',$arrVar);
