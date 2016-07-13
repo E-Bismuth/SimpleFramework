@@ -167,21 +167,27 @@ abstract class Model extends innerModel
      * @return array
      */
     public function get(){
-        return $this->getData();
+        $return = $this->getData();
+        $this->reInit();
+        return $return;
     }
 
     /**Return the first Element
      * @return array
      */
     public function first(){
-        return $this->limit(0,1)->getData();
+        $return = $this->limit(0,1)->getData();
+        $this->reInit();
+        return $return;
     }
 
     /**Return datas as Json
      * @return string
      */
     public function json(){
-        return json_encode($this->getData());
+        $return = json_encode($this->getData());
+        $this->reInit();
+        return $return;
     }
 
 
@@ -191,7 +197,9 @@ abstract class Model extends innerModel
      * @return array|mixed
      */
     public function exec(){
-        return $this->Execute();
+        $return = $this->Execute();
+        $this->reInit();
+        return $return;
     }
 
 
@@ -200,7 +208,9 @@ abstract class Model extends innerModel
      * @throws ModelException
      */
     public function debug(){
-        return $this->debugQuery();
+        $return = $this->debugQuery();
+        $this->reInit();
+        return $return;
     }
 
 }

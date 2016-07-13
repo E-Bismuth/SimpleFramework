@@ -241,6 +241,21 @@ abstract class innerModel
                 break;
         }
     }
+
+    /** Reinitializing value for further query
+     *
+     */
+    protected function reInit(){
+        $this->selectedKeys = [];
+        $this->existingKeys = [];
+        $this->where = [];
+        $this->limit = null;
+        $this->injected = [];
+        $this->execute = null;
+        $this->rawQuery = null;
+        $this->Join = [];
+    }
+
     /** ----------------------------   Debug Part  ------------------------------------ */
     
     /** Route method
