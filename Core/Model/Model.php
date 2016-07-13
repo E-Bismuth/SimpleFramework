@@ -56,6 +56,11 @@ abstract class Model extends innerModel
         $this->db = $db;
     }
 
+    /**Method that must be declare on child class that give the relation that can be made
+     * between tables
+     * exemple : array('users'=>array('users_id','id'))
+     * @return array
+     */
     abstract protected function Relations();
 
     /** ----------------------------   Query Builder  ------------------------------------ */
@@ -90,6 +95,27 @@ abstract class Model extends innerModel
      */
     public function limit($min, $max){
         $this->saveLimit($min, $max);
+        return $this;
+    }
+
+    /**Adding a group by to the sql
+     * @param $keys
+     * @param null $table
+     * @return $this
+     */
+    public function groupBy($keys, $table = null){
+        $this->saveGroupBy($keys,$table);
+        return $this;
+    }
+
+    /**Adding an order by to the sql
+     * in order to make a DESC just add a '!' before the field name
+     * @param $keys
+     * @param null $table
+     * @return $this
+     */
+    public function orderBy($keys, $table = null){
+        $this->saveOrderBy($keys,$table);
         return $this;
     }
 

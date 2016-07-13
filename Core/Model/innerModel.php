@@ -34,6 +34,14 @@ abstract class innerModel
      * @var
      */
     protected $limit;
+    /**Contain all the group by request
+     * @var
+     */
+    protected $groupBy = [];
+    /**Contain all the order by request
+     * @var
+     */
+    protected $orderBy = [];
     /**All the field that must be bind on sql
      * @var array
      */
@@ -126,6 +134,48 @@ abstract class innerModel
      */
     protected function saveLimit($min, $max){
         $this->limit = ['Min'=>$min,'Max'=>$max];
+    }
+
+    /**Proceed Group By
+     * @param $keys
+     * @param null $table
+     */
+    protected function saveGroupBy($keys, $table = null){
+        $table = $this->getTable($table);
+        if(is_array($keys)){
+            foreach ($keys AS $value){
+                $this->groupBy[$table][] = $value;
+            }
+        }
+        else{
+            $this->groupBy[$table][] = $keys;
+        }
+    }
+
+    /**Proceed Order By
+     * @param $keys
+     * @param null $table
+     */
+    protected function saveOrderBy($keys, $table = null){
+        $table = $this->getTable($table);
+        if(is_array($keys)){
+            foreach ($keys AS $value){
+                if(substr($value,0,1) == '!'){
+                    $this->orderBy[$table][] = substr($value,1) . ' DESC';
+                }
+                else{
+                    $this->orderBy[$table][] = $value . ' ASC';
+                }
+            }
+        }
+        else{
+            if(substr($keys,0,1) == '!'){
+                $this->orderBy[$table][] = substr($keys,1) . ' DESC';
+            }
+            else{
+                $this->orderBy[$table][] = $keys . ' ASC';
+            }
+        }
     }
 
     /** Proceed Save Where
@@ -250,6 +300,8 @@ abstract class innerModel
         $this->existingKeys = [];
         $this->where = [];
         $this->limit = null;
+        $this->groupBy = [];
+        $this->orderBy = [];
         $this->injected = [];
         $this->execute = null;
         $this->rawQuery = null;
@@ -606,6 +658,8 @@ abstract class innerModel
         $leftJoin = '';
         $where = '';
         $limit = '';
+        $groupBy = '';
+        $orderBy = '';
 
         if(is_array($this->limit)) {
             $limit = "LIMIT " . $this->limit['Min'] . ", " . $this->limit['Max'];
@@ -618,6 +672,24 @@ abstract class innerModel
             }
 
             $where = 'WHERE '. implode(' AND ',$arrWhere);
+        }
+        if(!empty($this->groupBy)){
+            foreach ($this->groupBy AS $tables=>$keys){
+                foreach ($keys AS $key){
+                    $arrGroupBy[]=$tables.'.'.$key;
+                }
+            }
+
+            $groupBy = 'GROUP BY '. implode(',',$arrGroupBy);
+        }
+        if(!empty($this->orderBy)){
+            foreach ($this->orderBy AS $tables=>$keys){
+                foreach ($keys AS $key){
+                    $arrOrderBy[]=$tables.'.'.$key;
+                }
+            }
+
+            $orderBy = 'ORDER BY '. implode(',',$arrOrderBy);
         }
         if(!empty($this->selectedKeys)){
             foreach ($this->selectedKeys AS $tables=>$keys){
@@ -659,6 +731,8 @@ abstract class innerModel
                     FROM $table 
                     $leftJoin 
                     $where
+                    $groupBy
+                    $orderBy
                     $limit
         ";
 
