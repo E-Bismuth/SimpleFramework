@@ -259,6 +259,7 @@ abstract class innerModel
      * @throws \Core\Model\src\ModelException
      */
     protected function getData(){
+        $this->execute = 'select';
         $query = $this->prepare();
         $data = $query->fetchAll();
         return $data;
@@ -453,6 +454,11 @@ abstract class innerModel
                         $this->where[$key] = $values;
                     }
                 }
+                if(is_array($calledModel->injected)){
+                    foreach($calledModel->injected AS $key=>$values){
+                        $this->injected[$key] = $values;
+                    }
+                }
             }
         }
         else{
@@ -592,7 +598,7 @@ abstract class innerModel
 
             foreach ($this->where AS $tables=>$keys){
                 foreach ($keys AS $key){
-                    $arrWhere[]=$tables.'.'.$key;
+                    $arrWhere[]= "(" . $tables.'.'.$key . ")";
                 }
             }
 
@@ -632,7 +638,7 @@ abstract class innerModel
 
             foreach ($this->where AS $tables=>$keys){
                 foreach ($keys AS $key){
-                    $arrWhere[]=$tables.'.'.$key;
+                    $arrWhere[]= "(" . $tables.'.'.$key . ")";
                 }
             }
 
@@ -667,7 +673,7 @@ abstract class innerModel
         if(!empty($this->where)){
             foreach ($this->where AS $tables=>$keys){
                 foreach ($keys AS $key){
-                    $arrWhere[]=$tables.'.'.$key;
+                    $arrWhere[]= "(" . $tables.'.'.$key . ")";
                 }
             }
 
