@@ -24,7 +24,7 @@ Group some Routes that will be all prefixed
 
 Model
 --------------------------------------------------
-The better part of this project!
+The better part of this project! (look exemple/model folder)
 
 It included a class name SPDO for MySQL connection to database that allow you to work easily with master/replication database
 
