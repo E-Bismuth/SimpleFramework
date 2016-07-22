@@ -50,7 +50,7 @@ abstract class Controller
      * @param $view
      * @param array $variables
      */
-    protected function render($view, $variables = []){
+    protected function render($view, $variables = [], $js = [], $css = []){
 
         ob_start();
         extract($variables);

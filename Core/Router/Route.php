@@ -74,7 +74,7 @@ class Route
     public function match($url){
         $url = trim($url,'/');
         $path = preg_replace_callback('#:([\w]+)#',[$this,'paramMatch'],$this->path);
-        $regex = "#^$path$#i";
+        $regex = "#^$path$#iu";
         if(!preg_match($regex,$url,$matches)){
             return false;
         }

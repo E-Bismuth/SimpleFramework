@@ -43,6 +43,41 @@ class autoload
         }
     }
 
+    public static function loadJS($scripts = []) {
+        if(count($scripts)!=0){
+            $Html = '';
+            foreach($scripts AS $js){
+                $Html .= "<!-- {$js['Coment']} -->";
+                if(is_array($js['Link'])){
+                    foreach ($js['Link'] as $link){
+                        $Html .= '<script src="' . $link . '"></script>';
+                    }
+                }
+                else{
+                    $Html .= '<script src="' . $js['Link'] . '"></script>';
+                }
+            }
+            return $Html;
+        }
+    }
+
+    public static function loadCSS($scripts = []) {
+        if(count($scripts)!=0){
+            $Html = '';
+            foreach($scripts AS $css){
+                $Html .= "<!-- {$css['Coment']} -->";
+                if(is_array($css['Link'])){
+                    foreach ($css['Link'] as $link){
+                        $Html .= '<link href="' . $link . '" rel="stylesheet">';
+                    }
+                }
+                else{
+                    $Html .= '<link href="' . $css['Link'] . '" rel="stylesheet">';
+                }
+            }
+            return $Html;
+        }
+    }
 
 }
 
