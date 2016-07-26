@@ -23,7 +23,7 @@ class Flash extends Session
 
     /**Get the value of a special field
      * @param $field
-     * @return bool
+     * @return mixed
      */
     public static function get($field)
     {
@@ -67,7 +67,7 @@ class Flash extends Session
      */
     public static function isExist($field)
     {
-        if(self::get('Flash/'.$field) !== false){
+        if(self::get($field) !== false){
             return true;
         }
         else{
