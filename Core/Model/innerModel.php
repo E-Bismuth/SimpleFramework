@@ -215,9 +215,7 @@ abstract class innerModel
      * @throws \Core\Model\src\ModelException
      */
     protected function doInsert(){
-        $query = $this->prepare();
-        $data = $query->fetch();
-        return $data;
+        return $this->prepare();
 
     }
 
@@ -226,9 +224,7 @@ abstract class innerModel
      * @throws \Core\Model\src\ModelException
      */
     protected function doUpdate(){
-        $query = $this->prepare();
-        $data = $query->fetch();
-        return $data;
+        return $this->prepare();
 
     }
 
@@ -237,9 +233,7 @@ abstract class innerModel
      * @throws \Core\Model\src\ModelException
      */
     protected function doRaw(){
-        $query = $this->prepare();
-        $data = $query->fetchAll();
-        return $data;
+        return $this->prepare();
 
     }
 
@@ -248,9 +242,7 @@ abstract class innerModel
      * @throws \Core\Model\src\ModelException
      */
     protected function doDelete(){
-        $query = $this->prepare();
-        $data = $query->fetchAll();
-        return $data;
+        return $this->prepare();
 
     }
 
@@ -260,9 +252,7 @@ abstract class innerModel
      */
     protected function getData(){
         $this->execute = 'select';
-        $query = $this->prepare();
-        $data = $query->fetchAll();
-        return $data;
+        return $this->prepare();
     }
 
 
@@ -551,13 +541,26 @@ abstract class innerModel
         $query = $this->db->prepare($query);
 
         if(is_array($this->injected)){
-            $query->execute($this->injected);
+            $execute = $query->execute($this->injected);
         }
         else{
-            $query->execute();
+            $execute = $query->execute();
         }
 
-        return $query;
+        switch ($this->execute){
+            case 'update':
+            case 'delete':
+                $return = $execute;
+                break;
+            case 'insert':
+                $return = $this->db->lastInsertId();
+                break;
+            default:
+                $return = $query->fetchAll();
+                break;
+        }
+
+        return $return;
     }
 
 
