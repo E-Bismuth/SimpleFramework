@@ -91,12 +91,12 @@ class Router
         $route = $this->singleRouteInstance($path,$callable);
 
         if((is_string($callable)) && $name === null){
-            $this->namedRoutes[$this->prefix.$callable] = $route;
-            $route->setName($this->prefix.$callable);
+            $this->namedRoutes[$callable] = $route;
+            $route->setName($callable);
         }
         else if($name){
-            $this->namedRoutes[$this->prefix.$name] = $route;
-            $route->setName($this->prefix.$name);
+            $this->namedRoutes[$name] = $route;
+            $route->setName($name);
 
         }
         $this->routes[$method][]=$route;
