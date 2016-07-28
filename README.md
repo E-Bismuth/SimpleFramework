@@ -56,3 +56,5 @@ Variables :
   3) projectVars here you can add all the params(string,array,object) that you whant to use/update after in the code.
   
   4) projectDefine here you can add all the params(string,array,object) that you whant to use and never update after in the code. Look like original DEFINE of php but give you oportunity to store array and object, can be use to define a singleton too.
+  
+  4) viewVars here you can add all the params(string,array,object) that you whant to use on the view.
