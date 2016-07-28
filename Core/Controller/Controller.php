@@ -7,6 +7,7 @@
  */
 
 namespace Core\Controller;
+use Core\Magic\Variables\viewVars\viewVars;
 
 
 /**
@@ -51,9 +52,12 @@ abstract class Controller
      * @param array $variables
      */
     protected function render($view, $variables = [], $js = [], $css = []){
-
+        if(count($variables)!=0){
+            foreach ($variables AS $key=>$variable){
+                viewVars::set($key,$variable);
+            }
+        }
         ob_start();
-        extract($variables);
         require($this->viewPath . str_replace($this->appViewExtractor,'/',$view) . '.' . $this->viewExt);
         $content = ob_get_clean();
         require($this->templatePath . $this->templateName . $this->templateEnterPoint . '.' . $this->templateExt);
