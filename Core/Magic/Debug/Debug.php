@@ -12,11 +12,11 @@ namespace Core\Magic\Debug;
 class Debug
 {
     public static function die_show($debuged){
-        echo '<pre>';print_r($debuged); echo '</pre>';
+        echo '<pre>';var_dump($debuged); echo '</pre>';
         die();
     }
     public static function show($debuged){
-        echo '<pre>';print_r($debuged); echo '</pre>';
+        echo '<pre>';var_dump($debuged); echo '</pre>';
     }
 
 }
