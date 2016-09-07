@@ -10,6 +10,7 @@
 namespace Core\Router;
 
 
+use Core\Magic\Variables\projectDefine\projectDefine;
 use Core\Magic\Variables\Server\Server;
 use Core\Router\src\routerException;
 
@@ -186,6 +187,7 @@ class Router
         }
         foreach ($this->routes[Server::get('REQUEST_METHOD')] as $route) {
             if($route->match($this->url)){
+                projectDefine::set('ACTUAL_ROOT',$route->getName());
                 return $route->call();
             }
         }
