@@ -94,7 +94,9 @@ abstract class innerModel
      */
     protected function saveFields($keys, $table = null){
 
-        $table = $this->getTable($table);
+        if($table == null){
+            $table = $this->getTable($table);
+        }
 
         if(!array_key_exists($table,$this->selectedKeys)){
             $this->selectedKeys[$table]=[];
