@@ -436,6 +436,11 @@ abstract class innerModel
                         $this->fields($values,$key);
                     }
                 }
+                if(is_array($calledModel->groupBy)){
+                    foreach($calledModel->groupBy AS $key=>$values){
+                        $this->groupBy[$key] = $values;
+                    }
+                }
                 if(is_array($calledModel->Join)){
                     foreach($calledModel->Join AS $key=>$values){
                         $this->Join[$key] = $values;
