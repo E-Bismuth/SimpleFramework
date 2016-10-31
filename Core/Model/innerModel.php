@@ -558,7 +558,7 @@ abstract class innerModel
                 $return = $this->db->lastInsertId();
                 break;
             default:
-                $return = $query->fetchAll();
+                $return = $query;
                 break;
         }
 

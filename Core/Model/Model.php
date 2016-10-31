@@ -195,7 +195,7 @@ abstract class Model extends innerModel
     public function get(){
         $return = $this->getData();
         $this->reInit();
-        return $return;
+        return $return->fetchAll();
     }
 
     /**Return the first Element
@@ -204,14 +204,23 @@ abstract class Model extends innerModel
     public function first(){
         $return = $this->limit(0,1)->getData();
         $this->reInit();
-        return $return;
+        return $return->fetch();
     }
 
     /**Return datas as Json
      * @return string
      */
     public function json(){
-        $return = json_encode($this->getData());
+        $return = $this->getData();
+        $this->reInit();
+        return json_encode($return->fetchAll());
+    }
+
+    /**Return the PDO Statement as object
+     * @return string
+     */
+    public function pdoStatement(){
+        $return = $this->getData();
         $this->reInit();
         return $return;
     }
