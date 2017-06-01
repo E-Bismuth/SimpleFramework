@@ -8,6 +8,7 @@
  */
 namespace Core\Model;
 
+use Core\Model\src\ModelException;
 use PDO;
 
 abstract class SPDO
