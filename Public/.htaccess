@@ -1,0 +1,9 @@
+DirectoryIndex index.php
+
+RewriteEngine On
+RewriteBase /
+
+
+RewriteCond %{REQUEST_URI} !^(/Assets/.*)$
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
