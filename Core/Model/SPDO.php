@@ -28,7 +28,7 @@ abstract class SPDO
      *
      * @var string
      */
-    protected $SQL_MASTER_HOST = 'localhost';
+    protected $SQL_MASTER_HOST = false;
     protected $SQL_REPL_HOST = false;
 
     /**
@@ -36,7 +36,7 @@ abstract class SPDO
      *
      * @var string
      */
-    protected $SQL_MASTER_USER = 'root';
+    protected $SQL_MASTER_USER = false;
     protected $SQL_REPL_USER = false;
 
     /**
@@ -44,7 +44,7 @@ abstract class SPDO
      *
      * @var string
      */
-    protected $SQL_MASTER_PASS = '';
+    protected $SQL_MASTER_PASS = false;
     protected $SQL_REPL_PASS = false;
 
     /**
@@ -52,7 +52,7 @@ abstract class SPDO
      *
      * @var string
      */
-    protected $SQL_DTB = 'test';
+    protected $SQL_DTB = false;
 
 
     /**
