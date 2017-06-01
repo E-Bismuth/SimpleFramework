@@ -42,6 +42,10 @@ abstract class innerModel
      * @var
      */
     protected $orderBy = [];
+    /**Contain all the Having request
+     * @var
+     */
+    protected $having = [];
     /**All the field that must be bind on sql
      * @var array
      */
@@ -145,8 +149,8 @@ abstract class innerModel
     protected function saveGroupBy($keys, $table = null){
         $table = $this->getTable($table);
         if(is_array($keys)){
-            foreach ($keys AS $value){
-                $this->groupBy[$table][] = $value;
+            foreach ($keys AS $k=>$value){
+                $this->groupBy[$table][$k] = $value;
             }
         }
         else{
@@ -199,6 +203,29 @@ abstract class innerModel
         }
         else{
             $this->where[$table][] = $keys;
+        }
+
+    }
+
+    /** Proceed Save Having
+     * @param $keys
+     * @param null $table
+     */
+    protected function saveHaving($keys, $table = null){
+
+        $table = $this->getTable($table);
+
+        if(!array_key_exists($table,$this->having)){
+            $this->having[$table]=[];
+        }
+
+        if(is_array($keys)){
+            foreach ($keys AS $value){
+                $this->having[$table][] = $value;
+            }
+        }
+        else{
+            $this->having[$table][] = $keys;
         }
 
     }
@@ -419,14 +446,45 @@ abstract class innerModel
      * @param callable|null $callable
      * @return $this
      */
-    protected function makeJoin($direction, Model $class, callable $callable = null){
+    protected function makeJoin($direction, Model $class, callable $callable = null,$multiRelationJoined = 0,$multiRelationFrom = 0){
+        $TableAS = '';
         $thisTable = $this->getTable();
         $table = $class->getTable();
+        $nameTable = $table;
         $thisRelation = $this->Relations();
         if((!empty($thisRelation)) && (array_key_exists($table,$thisRelation))){
-            if(!array_key_exists($table,$this->Join)){
-                $this->Join[$table]="$direction JOIN $table ON $thisTable.".$thisRelation[$table][0]."=$table.".$thisRelation[$table][1];
+            if(is_array($thisRelation[$table][0])){
+                if(is_array($thisRelation[$table][1])) {
+                    if(array_key_exists($table,$this->Join)){
+                        $TableAS = ' AS '.$table.count($this->Join[$table]);
+                        $nameTable = $table.count($this->Join[$table]);
+                    }
+                    $this->Join[$nameTable][]="$direction JOIN $table $TableAS ON $thisTable.".$thisRelation[$table][0][$multiRelationJoined]."=$nameTable.".$thisRelation[$table][1][$multiRelationFrom];
+                }
+                else{
+                    if(array_key_exists($table,$this->Join)){
+                        $TableAS = ' AS '.$table.count($this->Join[$table]);
+                        $nameTable = $table.count($this->Join[$table]);
+                    }
+                    $this->Join[$nameTable][]="$direction JOIN $table $TableAS ON $thisTable.".$thisRelation[$table][0][$multiRelationJoined]."=$nameTable.".$thisRelation[$table][1];
+                }
             }
+            elseif(is_array($thisRelation[$table][1])){
+                if(array_key_exists($table,$this->Join)){
+                    $TableAS = ' AS '.$table.count($this->Join[$table]);
+                    $nameTable = $table.count($this->Join[$table]);
+                }
+                $this->Join[$nameTable][]="$direction JOIN $table $TableAS ON $thisTable.".$thisRelation[$table][0]."=$nameTable.".$thisRelation[$table][1][$multiRelationFrom];
+            }
+            else{
+                if(array_key_exists($table,$this->Join)){
+                    $TableAS = ' AS '.$table.count($this->Join[$table]);
+                    $nameTable = $table.count($this->Join[$table]);
+                }
+                $this->Join[$nameTable][]="$direction JOIN $table $TableAS ON $thisTable.".$thisRelation[$table][0]."=$nameTable.".$thisRelation[$table][1];
+            }
+			
+        $class->table = $nameTable;
 
             if($callable != null){
                 $calledModel = call_user_func($callable, $class );
@@ -451,6 +509,11 @@ abstract class innerModel
                         $this->where[$key] = $values;
                     }
                 }
+                if(is_array($calledModel->having)){
+                    foreach($calledModel->having AS $key=>$values){
+                        $this->having[$key] = $values;
+                    }
+                }
                 if(is_array($calledModel->injected)){
                     foreach($calledModel->injected AS $key=>$values){
                         $this->injected[$key] = $values;
@@ -471,19 +534,19 @@ abstract class innerModel
      * @param callable|null $callable
      * @return $this
      */
-    protected function juncture($direction, Model $class, callable $callable = null){
+    protected function juncture($direction, Model $class, callable $callable = null,$multiRelationJoined = 0,$multiRelationFrom = 0){
         switch ($direction){
             case 'left':
-                $this->leftJoin($class, $callable);
+                $this->leftJoin($class, $callable,$multiRelationJoined,$multiRelationFrom);
                 break;
             case 'right':
-                $this->rightJoin($class, $callable);
+                $this->rightJoin($class, $callable,$multiRelationJoined,$multiRelationFrom);
                 break;
             case 'inner':
-                $this->innerJoin($class, $callable);
+                $this->innerJoin($class, $callable,$multiRelationJoined,$multiRelationFrom);
                 break;
             default:
-                $this->leftJoin($class, $callable);
+                $this->leftJoin($class, $callable,$multiRelationJoined,$multiRelationFrom);
                 break;
         }
         return $this;
@@ -494,8 +557,8 @@ abstract class innerModel
      * @param callable|null $callable
      * @return $this
      */
-    protected function leftJoin(Model $class, callable $callable = null){
-        return $this->makeJoin('LEFT',$class,$callable);
+    protected function leftJoin(Model $class, callable $callable = null,$multiRelationJoined = 0,$multiRelationFrom = 0){
+        return $this->makeJoin('LEFT',$class,$callable,$multiRelationJoined,$multiRelationFrom);
     }
 
     /** route the junction to the good method
@@ -503,8 +566,8 @@ abstract class innerModel
      * @param callable|null $callable
      * @return $this
      */
-    protected function rightJoin(Model $class, callable $callable = null){
-        return $this->makeJoin('RIGHT',$class,$callable);
+    protected function rightJoin(Model $class, callable $callable = null,$multiRelationJoined = 0,$multiRelationFrom = 0){
+        return $this->makeJoin('RIGHT',$class,$callable,$multiRelationJoined,$multiRelationFrom);
     }
 
     /** route the junction to the good method
@@ -512,8 +575,8 @@ abstract class innerModel
      * @param callable|null $callable
      * @return $this
      */
-    protected function innerJoin(Model $class, callable $callable = null){
-        return $this->makeJoin('INNER',$class,$callable);
+    protected function innerJoin(Model $class, callable $callable = null,$multiRelationJoined = 0,$multiRelationFrom = 0){
+        return $this->makeJoin('INNER',$class,$callable,$multiRelationJoined,$multiRelationFrom);
     }
 
     /** ----------------------------   Query Builder Part  ------------------------------------ */
@@ -676,6 +739,7 @@ abstract class innerModel
         $limit = '';
         $groupBy = '';
         $orderBy = '';
+        $having = '';
 
         if(is_array($this->limit)) {
             $limit = "LIMIT " . $this->limit['Min'] . ", " . $this->limit['Max'];
@@ -689,15 +753,47 @@ abstract class innerModel
 
             $where = 'WHERE '. implode(' AND ',$arrWhere);
         }
+        if(!empty($this->having)){
+            foreach ($this->having AS $tables=>$keys){
+                foreach ($keys AS $key){
+                    $arrHaving[]= "(" .$key . ")";
+                }
+            }
+
+            $having = 'HAVING '. implode(' AND ',$arrHaving);
+        }
+		
         if(!empty($this->groupBy)){
             foreach ($this->groupBy AS $tables=>$keys){
-                foreach ($keys AS $key){
-                    $arrGroupBy[]=$tables.'.'.$key;
+                foreach ($keys AS $key =>$value){
+                    //$arrGroupBy[]=$tables.'.'.$key;
+                    
+                    if(is_array($value)){
+                        if((!array_key_exists('Action',$value)) || (!array_key_exists('Value',$value))){
+                            throw new ModelException('You have to provide "Action" and "Value" in order to define a special field');
+                        }
+                        else{
+                            $string = '';
+                            foreach ($value['Value'] AS $k=>$v){
+                                if(preg_match("/[a-zA-Z-_0-9]+/", $v)){
+                                    $string .= $tables.'.'.$v.',';
+                                }
+                                else{
+                                    $string .= '"'.$v.'",';
+                                }
+                            }
+                            $arrGroupBy[] = $value['Action']. '(' .substr($string,0,-1) . ')';
+                        }
+                    }
+                    else{
+                        $arrGroupBy[]=$tables.'.'.$value;
+                    }
                 }
             }
 
             $groupBy = 'GROUP BY '. implode(',',$arrGroupBy);
         }
+		
         if(!empty($this->orderBy)){
             foreach ($this->orderBy AS $tables=>$keys){
                 foreach ($keys AS $key){
@@ -707,6 +803,7 @@ abstract class innerModel
 
             $orderBy = 'ORDER BY '. implode(',',$arrOrderBy);
         }
+		
         if(!empty($this->selectedKeys)){
             foreach ($this->selectedKeys AS $tables=>$keys){
                 foreach ($keys AS $key=>$value){
@@ -737,7 +834,14 @@ abstract class innerModel
         }
         if(!empty($this->Join)){
             foreach ($this->Join AS $tables=>$keys){
-                $leftJoin .= $keys.' ';
+                if(is_array($keys)){
+                    foreach ($keys AS $value){
+                        $leftJoin .= $value.' ';
+                    }
+                }
+                else{
+                    $leftJoin .= $keys.' ';
+                }
             }
         }
 
@@ -748,6 +852,7 @@ abstract class innerModel
                     $leftJoin 
                     $where
                     $groupBy
+                    $having
                     $orderBy
                     $limit
         ";

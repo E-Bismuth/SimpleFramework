@@ -9,6 +9,7 @@
 
 namespace Core\Model;
 
+use Core\Magic\Debug\Debug;
 use Core\Model\src\ModelException;
 
 /** List of all the possibilities of the model
@@ -88,6 +89,65 @@ abstract class Model extends innerModel
         return $this;
     }
 
+    /** Where IN or list of Where IN
+     * @param $keys string|array
+     * @param null $table
+     * @return $this
+     */
+    public function whereIn(array $keys, $table = null){
+        $send = [];
+        foreach ($keys AS $key=>$value){
+            if(is_array($value)){
+                if(count($value)!=0){
+                    $send[]=$key . ' IN (' . implode(',',$value) . ')';
+                }
+            }
+            else{
+                $this->where("$key = $value");
+            }
+        }
+        if(count($send)!=0){
+            $this->saveWhere($send, $table);
+        }
+        return $this;
+    }
+
+    /** Where Not IN or list of Where Not IN
+     * @param $keys string|array
+     * @param null $table
+     * @return $this
+     */
+
+    public function whereNotIn(array $keys, $table = null){
+        $send = [];
+        foreach ($keys AS $key=>$value){
+            if(is_array($value)){
+                if(count($value)!=0){
+                    $send[]=$key . ' NOT IN (' . implode(',',$value) . ')';
+                }
+
+            }
+            else{
+                $this->where("$key != $value");
+            }
+        }
+        if(count($send)!=0){
+            $this->saveWhere($send, $table);
+        }
+        return $this;
+    }
+
+
+    /** having or list of having
+     * @param $keys string|array
+     * @param null $table
+     * @return $this
+     */
+    public function having($keys, $table = null){
+        $this->saveHaving($keys, $table);
+        return $this;
+    }
+
     /** Limit of the SQL result
      * @param $min
      * @param $max
@@ -126,8 +186,8 @@ abstract class Model extends innerModel
      * @param callable|null $callable
      * @return $this
      */
-    protected function join($direction, Model $class, callable $callable = null){
-        return $this->juncture($direction, $class, $callable);
+    protected function join($direction, Model $class, callable $callable = null,$multiRelationJoined = 0,$multiRelationFrom = 0){
+        return $this->juncture($direction, $class, $callable,$multiRelationJoined,$multiRelationFrom);
     }
 
     /** List of injected params on
