@@ -142,12 +142,22 @@ abstract class SPDO
      */
     private function CheckBefore($query)
     {
-        if(!$this->SQL_REPL_HOST){
+        if((!$this->SQL_MASTER_HOST) && (!$this->SQL_REPL_HOST)){
+            throw new ModelException('No configuration decalred');
+        }
+        else if(!$this->SQL_REPL_HOST){
             if(is_null($this->PDOMasterInstance))
             {
                 $this->ConstructMaster();
             }
             $this->PDOInstance = $this->PDOMasterInstance;
+        }
+        else if(!$this->SQL_MASTER_HOST){
+            if(is_null($this->PDOMasterInstance))
+            {
+                $this->ConstructReplication();
+            }
+            $this->PDOInstance = $this->PDOReplicationInstance;
         }
         else{
             if($this->CheckQuery($query)===true){
