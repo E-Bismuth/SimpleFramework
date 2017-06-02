@@ -6,4 +6,4 @@ RewriteBase /
 
 RewriteCond %{REQUEST_URI} !^(/Assets/.*)$
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+RewriteRule ^(.*)$ rewrited.php?url=$1 [QSA,L]

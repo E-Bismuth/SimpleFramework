@@ -1,0 +1,45 @@
+<VirtualHost *:80>
+ # The ServerName directive sets the request scheme, hostname and port that
+ # the server uses to identify itself. This is used when creating
+ # redirection URLs. In the context of virtual hosts, the ServerName
+ # specifies what hostname must appear in the request's Host: header to
+ # match this virtual host. For the default virtual host (this file) this
+ # value is not decisive as it is used as a last resort host regardless.
+ # However, you must set it for any further virtual host explicitly.
+ #ServerName www.example.com
+
+ #########################
+ ##    Accept rewrite   ##
+ ##                     ##
+ #sudo a2enmod rewrite
+ ##                     ##
+ #########################
+
+
+ ServerAdmin webmaster@localhost
+ ServerName www.localhost.com
+ DocumentRoot /var/www/
+
+
+        <Directory /var/www/SimpleFramework/>
+                Options FollowSymLinks
+                DirectoryIndex rewrited.php
+                AllowOverride All
+                Order allow,deny
+                allow from all
+        </Directory>
+
+
+    ########## Rewrite rules ##########
+        RewriteEngine on
+
+    ########## Rewrite rules 1 ##########
+        RewriteCond %{HTTP_HOST} ^www.localhost.com
+        RewriteRule ^/(.*) /var/www/SimpleFramework/Public/$1 [L]
+
+	#ErrorLog ${APACHE_LOG_DIR}/error.log
+	#CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+</VirtualHost>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
