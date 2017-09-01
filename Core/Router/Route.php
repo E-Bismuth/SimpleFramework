@@ -55,6 +55,10 @@ class Route
      * @var array
      */
     private $params = [];
+    /**indexef for sitemap
+     * @var array
+     */
+    private $sitemap = true;
 
     /**
      * Route constructor.
@@ -144,5 +148,30 @@ class Route
             $path = str_replace(":$k",$v,$path);
         }
         return $path;
+    }
+
+    /**not index for sitemap
+     * @return $this
+     */
+    public function notIndex(){
+        $this->sitemap = false;
+        return $this;
+    }
+
+    /**index strong for sitemap
+     * @return $this
+     */
+    public function index($value = 0){
+        if(is_int($value)){
+            $this->sitemap = $value;
+        }
+        return $this;
+    }
+
+    /**not index for sitemap
+     * @return $this
+     */
+    public function getIndex(){
+        return $this->sitemap;
     }
 }

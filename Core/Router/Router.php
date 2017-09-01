@@ -182,6 +182,7 @@ class Router
      * @throws routerException
      */
     public function run(){
+        projectDefine::set('ROUTER',$this);
         if(!isset($this->routes[Server::get('REQUEST_METHOD')])){
             throw new routerException('REQUEST_METHOD does not exist');
         }
@@ -219,6 +220,25 @@ class Router
             throw new routerException('No matching route named');
         }
         return $this->namedRoutes[$name]->getUrl($params);
+    }
+
+    /**Build SiteMap
+     * @param $name
+     * @param array $params
+     * @return mixed
+     * @throws routerException
+     */
+    public function siteMap(){
+        $siteMap = [];
+        foreach ($this->namedRoutes AS $route){
+            if($route->getIndex() !== false){
+                $siteMap[] = [
+                    'Url'=>$route->getUrl([]),
+                    'Index'=>$route->getIndex()
+                ];
+            }
+        }
+        return $siteMap;
     }
 
 }
