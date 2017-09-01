@@ -15,12 +15,13 @@ use Core\Magic\Variables\Session\Flash;
 
 class autoload
 {
-    const BASE_URI = '../';
+    private $BASE_URI = '../';
     const AL_END_EXT = ".php";
 
     private $ClassName,$ClassFile;
 
     public function __construct() {
+        $this->BASE_URI = dirname(__DIR__);
         spl_autoload_register(array($this,'AutoLoadProject'));
     }
 
@@ -32,7 +33,7 @@ class autoload
 
     }
     private function AutoLoadFile() {
-        return self::BASE_URI . '/' . $this->ClassFile . self::AL_END_EXT;
+        return $this->BASE_URI . '/' . $this->ClassFile . self::AL_END_EXT;
     }
     private function AutoLoadProject($name) {
         $this->ClassName = $name;
